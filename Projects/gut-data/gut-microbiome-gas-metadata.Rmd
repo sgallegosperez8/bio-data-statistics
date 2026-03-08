@@ -1,0 +1,128 @@
+---
+title: "BIOL606 MIDTERM1 PRESENTATION GALLEGOSPEREZ, Lu"
+author: "Samantha Gallegos Perez, Meilyn Lu"
+date: "2026-02-05"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(car)
+library(Hmisc)
+library(readr)
+library(ggfortify)
+
+```
+
+
+## Load the metadata
+
+Loaded the data into a variable called oc_data and used head() to check variables. 
+```{r loadData}
+oc_data = read_tsv("metadata-r-na_treat-diet.tsv")
+head(oc_data)
+
+```
+
+# Data Collection and Data Wrangling 
+
+This metadata contains faecal samples collected from 65 women, comparing OC users with non-users at two menstrual cycle time points (Day 1 and Day 21). Breath tests measured hydrogen and CH4 production and other characteristics like Age, Ethnicity, Height, Weight, BMI, Age of Menarche, average number of days between periods, OCE2 dosage, age when first OC was used, total years on OC, bowel diary collection time, BM per day, BM per week, average amount per week, and average strain (Terrazas et al., Simpson et al.). These studies encourage our interest to understand how OC user history with our without a prune diet  can influence H2 breath emissions.
+
+## Our hypothesis: Does prune diet have an effect on H2 emissions and is it's effect associated with years of Oral Contraceptive (OC) use?
+
+The metadata contains rows of information focused on pre- and post test data that fall out of scope for this assignment. To fall within scope, we decided to focus on post test data that included OC users only from Day 21. To test our hypothesis, we would only use the variables, Diet, TotalYearsOnOC, and H2, and treat Diet as a categorical independent variable, TotalYearsOnOC as a continuous independent variable and H2 as continuous dependent variable. 
+
+Before proceeding with our analysis, we wrangled our data by changed our Diet variable, formerly as a 'char', to a 'factor'. As well, we used the piping method to filter oc_data to focus on rows that include Treatment variable equal to 'User' and Day variable equal to 'Day 21'.
+```{r DataWrangling}
+
+oc_data$Diet = as.factor(oc_data$Diet)#changed the data type from char to factor to continue with our analysis and assigned it to the same variable name
+
+#Used the piping method to focus on dataframe oc_data, to filter rows of data from Day 21 under the Day column and OC users from the Treatment column
+new_data = oc_data%>%
+  filter(Treatment == "User" & Day == "Day 21")
+
+```
+
+# Initial Inspection
+
+I completed a histogram on the H2 emission values to check to see if the response variable values formed a normal distribution. 
+```{r histogram}
+#preview of H2 dependent variable
+hist(new_data$H2,
+     main= "H2 Breath Emissions",#changed the title of the histogram
+     xlab= "H2", #renamed the x axis label
+     border = "black",#changed the border of each bar to black
+     col = "purple", #the overall color of the bars on the histogram
+     breaks=5)
+
+```
+
+
+In order to proceed with analysis, we needed to use the proper test to understand if there was interaction between a categorical independent variable (Diet) and a continuous independent variable (TotalYearsOnOC) and its effect on a continuous dependent variable (H2). We created a linear model that tested for this interaction using the new_data that was properly filtered.
+```{r linearmodel}
+#Linear Model to test the interaction between two independent variables 
+model = lm(H2~Diet*TotalYearsOnOC, data = new_data)#H2-DEPENDENT,TotalYearsOnOC-INDEPENDENT,Diet=INDEPENDENT
+
+```
+
+# Testing Assumptions
+
+In this section, I am checking the assumptions of my model. The function, autoplot(), produces four diagnostic plots that can help check our data for heteroskedasticity, normality,etc. These plots are based on the residuals around the line.
+
+Residual vs Fitted: There seems to be no hump shapes or valleys apparent,so I can say it looks ok.
+Normal Q-Q: This plot evaluates the assumption of normality and is a stronger tool to check for normality than a histogram. This plot looks ok. 
+Scale-Location: This plot tests for equal variances, and there should be no pattern but here we can see a bit of fanning out. We chose to continue.
+Residuals vs Leverage: This plot detects influential points and potential outliers. Based on the plot, there seems to be no outliers, so we may continue. 
+
+```{r testassumptions}
+#check assumptions using the autoplot() function from the ggfortify package
+autoplot(model)
+```
+
+# ANCOVA Testing 
+
+This chunk of code will use the linear model, 'model', and use the anova() and summary() functions.
+```{r ANCOVA}
+#anova and summary 
+anova(model)
+#After running the anova, I can see that the independent variable Diet, is considered to not be significant with a p-value of 0.05237, and TotalYearsOnOC with a p-value of 0.02502, significant. We can also see that the tested interaction is not significant with a p-value of 0.14648.
+
+summary(model)
+#provides a table of estimates of the coefficients of the line that is the model. In this case, the linear equations would be:
+
+#No prune linear: H2=-12.91(YearsOC)+82.15
+#Prune linear:    H2=-3.91(YearsOC)+49.99
+
+```
+
+## Final Visualization
+
+This final visualization will plot our y, H2 emission, as a function of x, our two independent variables, Diet, and TotalYearsOnOC. We also created a regression line to the plot and the grey-ish color surrounding the regression line depicts the confidence level. 
+```{r finalvisualization}
+#create final visualization using x=continuous independent variable, y=continuous dependent variable,
+#and color as a continuous independent variable.
+ggplot(new_data, aes(x=TotalYearsOnOC, y=H2, color = Diet)) +
+  geom_point() + #creates the scatterplot to see how the data trends 
+  scale_color_manual(values=c('No Prune'="blue", 'Prune' ="red")) + theme_bw() +
+  geom_smooth(method="lm") + #creates the regression line and confidence level around it
+  theme(
+    axis.title.x= element_text(size=16), #adjusts the x axis title size
+    axis.title.y=element_text(size=16), #adjusts the y axis title size
+    title=element_text(size=16)) + #adjusts the tile label size
+  labs(title="Years of OC Usage and Prune Diet on H2 Emissions", #creates the figure title
+       x= "OC Use (years)", #creates the x axis label name
+       y= "H2 breath emissions") #creates y axis label name
+
+
+```
+
+# Conclusion
+Diet (F=4.05; df=1;p=0.052) and the interaction of diet and years on OC (F=2.21; df=1; p=0.146) were not statistically significant in their effect on H2 breath emissions with a significance threshold of 0.05. However, diet is only ~0.02 over this value, so it can be considered slightly significant. Additionally, Years on OC (F=5.51; df=1; p=0.025) did have a significant effect on H2 breath emissions.
+
+
+
