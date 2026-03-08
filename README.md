@@ -2,6 +2,6 @@
 
 Attached are associated projects included in biological data
 
-## gut-microbiome-stat-analysis
+## [gut-microbiome-stat-analysis] (https://github.com/sgallegosperez8/bio-data-statistics/tree/main/Projects/gut-data)
 
-##[microbial-comm-data](https://github.com/sgallegosperez8/bio_data/tree/main/Projects/microbial-comm-data)
+## [microbial-comm-data](https://github.com/sgallegosperez8/bio-data-statistics/tree/main/Projects/microbial-comm-data)
