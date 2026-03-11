@@ -1,6 +1,6 @@
 ---
-title: "BIOL606 MIDTERM1 PRESENTATION GALLEGOSPEREZ, Lu"
-author: "Samantha Gallegos Perez, Meilyn Lu"
+title: "Gut Microbiome Metadata Analysis GALLEGOSPEREZ"
+author: "Samantha Gallegos Perez"
 date: "2026-02-05"
 output: html_document
 editor_options: 
