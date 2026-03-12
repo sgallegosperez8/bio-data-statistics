@@ -9,4 +9,4 @@ Breath H2 emissions were analyzed using a general linear regression model which 
 Diet (F=4.05; df=1;p=0.052) and the interaction of diet and years on OC (F=2.21; df=1; p=0.146) were not statistically significant in their effect on H2 breath emissions with a significance threshold of 0.05. However, diet is only ~0.02 over this value, so it can be considered slightly significant. Additionally, Years on OC (F=5.51; df=1; p=0.025) did have a significant effect on H2 breath emissions.
 
 
-## [microbial-comm-stat-analysis](https://github.com/sgallegosperez8/bio-data-statistics/tree/main/Projects/microbial-comm-data)
+## [microbial-comm-stat-analysis](https://github.com/sgallegosperez8/bio-data-statistics/tree/main/microbial-comm-data)
