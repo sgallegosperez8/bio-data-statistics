@@ -3,6 +3,8 @@ title: "BIOL606 MIDTERM2 GallegosPerez Carter"
 author: "Samantha Gallegos Perez, Sjana Carter"
 date: "2026-03-11"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -19,26 +21,60 @@ library(AICcmodavg)
 
 # Load the Data
 
-Added the data set
+Loaded the data into a variable called soil_initial and used head() to check variables.
 ```{r load data}
-soil <- read.csv("trimmed_metadata.csv") #load the data
+soil_initial <- read.csv("trimmed_metadata.csv")#load the data
+head(soil_initial)
 ```
 
+## Our Question: Did fire management practice affect the relative abundance of bacteria, and does this depend on season?
+
+##Hypothesis: We expect a higher bacterial relative abundance in the warmer months, with summer having the highest, followed by spring, and winter to have the lowest counts. We also predict bacterial amplicon counts will decrease immediately following fire regardless of season.
 
 # Data Collection and Data Wrangling 
 
-## Our Hypothesis: 
-```{r}
+This metadata contains information of soil samples collected from remnant, restored, and  agricultural fields from ten sites at Nachusa Grasslands. This data set includes repeated measures completed on May 2 (Spring), August 8(Summer), and October 13 (Autumn) in 2017 (Mason et al., 2023). Additionally, fire management practices (y/n) were also included in this experiment. This study encouraged our interest to understand the role season and fire management practices play in the increase of relative abundance of bacterial counts using repeated studies. 
+
+To test our hypothesis, we would only use the variables, Site, Fire, bacteria, archaea, fungi and season. Our continuous dependent variable would be bacteria, and independent variables would be Site, Fire, and Season. Fire and season were treated as fixed factors and Site would be treated as a random factor, making this a mixed model analysis. 
+
+Before proceeding with our analysis, we wrangled our data by converting our Fire, Season and Site variables from data type "char" to "factor". The original data set was filtered to only include Site, Fire, bacteria, archaea, fungi, and season. Additionally, the data was mutated to calculate relative abundance of bacterial counts by dividing bacterial values by the sum of bacteria, archaea, and fungi. 
+```{r data wrangling}
 
 #Only selected necessary columns that include soil, Site, Date, Type, fungi, bacteria and archaea 
-soil_d <- select(soil, Site, Date, Fire, fungi, bacteria, archaea, season)
+filtered_soil <- select(soil, Site, Date, Fire, fungi, bacteria, archaea, season)
+
+
+#check for balance
+table(filtered_soil$Site) #every site has three rows
+table(filtered_soil$Fire)#yes to added fire has 12 values, and no to added fire has 18 values
+#unbalanced
+table(filtered_soil$season)#three equal amounts of 10
+
+#these are bacterial counts, divided bacteria to the total of bacterial+archaea+fungal to get the relative abundance
+final_soil <- mutate(filtered_soil, bact_relative_abund = bacteria/(bacteria+archaea+fungi))
+
+#our random factor is Site, and fixed factors will be Fire and season
+#changed "char" data type for season, Site, and fire to "factor"
+final_soil$Site <- as.factor(final_soil$Site)
+final_soil$season <- as.factor(final_soil$season)
+final_soil$Fire <- as.factor(final_soil$Fire)
+
 ```
 
 # Initial Inspection
+```{r initial plot}
+
+```
 
 
 
 # Mixed Model Testing
+```{r mixed model}
+
+
+
+
+```
 
 
 # Final Visualization
