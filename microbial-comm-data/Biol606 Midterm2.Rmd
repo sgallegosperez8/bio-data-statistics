@@ -17,6 +17,7 @@ library(Hmisc)
 library(ggfortify)
 library(AICcmodavg)
 library(nlme)
+library(emmeans)
 ```
 
 # Load the Data
@@ -62,8 +63,18 @@ final_soil$Fire <- as.factor(final_soil$Fire)
 ```
 
 # Initial Inspection
-```{r initial plot}
+What do we wanna show before 
 
+```{r initial plot}
+#created a histogram 
+hist(final_soil$bact_relative_abund)
+#create an initial plot to demonstrate the abundance levels 
+ggplot(final_soil, aes(x=season,y=bact_relative_abund,fill=Fire)) +
+  geom_boxplot() +
+  scale_y_continuous(limits=c(0,1))
+
+#residuals
+#qqplot
 ```
 
 
@@ -71,9 +82,8 @@ final_soil$Fire <- as.factor(final_soil$Fire)
 # Mixed Model Testing
 ```{r mixed model}
 
-#created initial model
+#created our linear mixed effect model including our IVs: Season and Fire, and DV:bact_relative_abund using our random variable as Site
 soil_model <- lme(bact_relative_abund~season*Fire, random = ~1| Site, data = final_soil, method = "ML")
-#season and fire are the independent variables, the random factor is Site, and the dependent variable is bact_relative_abund
 
 #exported the initial plot of residuals to Model_Residuals_Plot.png
 png(filename = "Model_Residuals_Plot.png")
@@ -81,12 +91,13 @@ plot(soil_model)
 dev.off()
 
 #checked the residuals for normality
-qqplot_1 <- qqnorm(resid(soil_model))#initial inspections a linear line 
-png(filename = "Normal_Q-Q_plot.png")#saved the qqnorm plot to Normal_Q-Q_plot.png
+qqnorm(resid(soil_model))#initial inspections a linear line 
+qqplot_1 <- qqline(resid(soil_model))
+png(filename = "Normal_Q-Q_plot.png")#saved the qqnorm/qqline plot to Normal_Q-Q_plot.png
 plot(qqplot_1)
 dev.off()
 
-#because the experiment was unbalanced, we would use type III, using the interaction
+#because the experiment was unbalanced, we would use type III, using the interaction and would need to change the contrasts before and after running Anova
 options(contrasts = c("contr.sum","contr.poly"))
 soil_model <- lme(bact_relative_abund~season*Fire, random = ~1| Site, data = final_soil, method = "ML") #remember to refit the model, and to reset contrast after
 Anova(soil_model, type=3) #type 3 because there's an interaction
@@ -94,16 +105,36 @@ options(contrasts = c("contr.treatment","contr.poly"))
 ```
 
 ```{r summary}
-
+#re-ran our model in order to get the summary 
 soil_model <- lme(bact_relative_abund~season*Fire, random = ~1| Site, data = final_soil, method = "ML")
 summary(soil_model)
+
+#check the emmeans to analyze means from the summary 
+emmeans(soil_model, specs=c('season','Fire'))
 ```
+
+
+do emmeans
+
 
 
 # Final Visualization
 ```{r final visualization}
-ggplot(final_soil, aes(x=season,y=bact_relative_abund,fill=Fire)) +
-  geom_boxplot()
+#changed the order of the values of the season variable for visualization purposes
+final_soil$season <- factor(final_soil$season, levels = c("Spring", "Summer", "Autumn"))
+
+#create the final visualization
+final_plot <- ggplot(final_soil, aes(x=season,y=bact_relative_abund,fill=Fire)) +
+  geom_boxplot() +#use a box-plot for two categorical IVs, and 1 DV
+  scale_fill_manual(values = c("y" = "orange", "n" = "lightblue" )) + #customize color:orange for fire(y), light blue for no fire(n)
+  labs(title ="Effect of Fire and Season on Bacterial Relative Abundance", x ="Season", y="Bacterial Relative Abundance") +#created the titles 
+  geom_point(position = position_dodge(width = .75)) +
+  theme_classic() + #created a white background
+  theme(plot.title = element_text(hjust = 0.5, size= 14), axis.title.x= element_text(size=12), axis.title.y=element_text(size=12), axis.text.x = element_text(size=11), axis.text.y = element_text(size=11),legend.title = element_text(size=14),legend.text = element_text(size=10))
+#adjusted sizes of all text and titles within theme
+
+#save the visualization
+ggsave(filename = "Fire_Management_Season_on_Plot.png", final_plot)
 ```
 
 # Conclusion
