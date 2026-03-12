@@ -1,6 +1,6 @@
 ---
-title: "BIOL606 MIDTERM1 PRESENTATION GALLEGOSPEREZ, Lu"
-author: "Samantha Gallegos Perez, Meilyn Lu"
+title: "Gut Microbiome Metadata Analysis GALLEGOSPEREZ"
+author: "Samantha Gallegos Perez"
 date: "2026-02-05"
 output: html_document
 editor_options: 
@@ -81,7 +81,9 @@ Residuals vs Leverage: This plot detects influential points and potential outlie
 
 ```{r testassumptions}
 #check assumptions using the autoplot() function from the ggfortify package
-autoplot(model)
+plot1 <- autoplot(model)
+
+ggsave(filename = "DiagnosticPlot.png", plot=plot1)
 ```
 
 # ANCOVA Testing 
@@ -106,19 +108,19 @@ This final visualization will plot our y, H2 emission, as a function of x, our t
 ```{r finalvisualization}
 #create final visualization using x=continuous independent variable, y=continuous dependent variable,
 #and color as a continuous independent variable.
-ggplot(new_data, aes(x=TotalYearsOnOC, y=H2, color = Diet)) +
+plot2 = ggplot(new_data, aes(x=TotalYearsOnOC, y=H2, color = Diet)) +
   geom_point() + #creates the scatterplot to see how the data trends 
   scale_color_manual(values=c('No Prune'="blue", 'Prune' ="red")) + theme_bw() +
   geom_smooth(method="lm") + #creates the regression line and confidence level around it
   theme(
-    axis.title.x= element_text(size=16), #adjusts the x axis title size
-    axis.title.y=element_text(size=16), #adjusts the y axis title size
-    title=element_text(size=16)) + #adjusts the tile label size
+    axis.title.x= element_text(size=13), #adjusts the x axis title size
+    axis.title.y=element_text(size=13), #adjusts the y axis title size
+    title=element_text(size=14)) + #adjusts the tile label size
   labs(title="Years of OC Usage and Prune Diet on H2 Emissions", #creates the figure title
        x= "OC Use (years)", #creates the x axis label name
        y= "H2 breath emissions") #creates y axis label name
 
-
+ggsave(filename = "YearsOnOCandPruneDietvsH2Emissions.png",plot=plot2)
 ```
 
 # Conclusion
