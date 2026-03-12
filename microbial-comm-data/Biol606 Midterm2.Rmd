@@ -1,0 +1,48 @@
+---
+title: "BIOL606 MIDTERM2 GallegosPerez Carter"
+author: "Samantha Gallegos Perez, Sjana Carter"
+date: "2026-03-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(car)
+library(Hmisc)
+library(readr)
+library(ggfortify)
+library(AICcmodavg)
+```
+
+# Load the Data
+
+Added the data set
+```{r load data}
+soil <- read.csv("trimmed_metadata.csv") #load the data
+```
+
+
+# Data Collection and Data Wrangling 
+
+## Our Hypothesis: 
+```{r}
+
+#Only selected necessary columns that include soil, Site, Date, Type, fungi, bacteria and archaea 
+soil_d <- select(soil, Site, Date, Fire, fungi, bacteria, archaea, season)
+```
+
+# Initial Inspection
+
+
+
+# Mixed Model Testing
+
+
+# Final Visualization
+
+# Conclusion
+
+
