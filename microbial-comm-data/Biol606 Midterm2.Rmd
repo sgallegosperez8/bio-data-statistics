@@ -64,7 +64,6 @@ final_soil$Fire <- as.factor(final_soil$Fire)
 
 # Initial Inspection
 What do we wanna show before 
-
 ```{r initial plot}
 #created a histogram 
 hist(final_soil$bact_relative_abund)
@@ -136,7 +135,8 @@ final_plot <- ggplot(final_soil, aes(x=season,y=bact_relative_abund,fill=Fire)) 
 #save the visualization
 ggsave(filename = "Fire_Management_Season_on_Plot.png", final_plot)
 ```
-
 # Conclusion
+Based on the Analysis of Deviance Table, there was no significant interaction between fire management and season and how it affects the relative abundance of bacteria (χ = 1.04; df=2; χ ²= 0.592). Independently, Season (χ = 1.35; df=2; χ ²= 0.509) and Fire (χ = 1.40; df=1; χ ²= 0.237) did not show any significant affect on relative abundance either. Bacterial relative abundance was high and was not dependent on Season Fire, or their interaction. With added fire management practices, there was a 0.05% increase in abundance for spring, 0.09% for Summer and 0.17% for Autumn. 
+
 
 
