@@ -1,5 +1,5 @@
 ---
-title: "BIOL606 MIDTERM2 GallegosPerez Carter"
+title: "BIOL606 MIDTERM2 GallegosPerez and Carter"
 author: "Samantha Gallegos Perez"
 date: "2026-03-11"
 output: html_document
@@ -13,9 +13,6 @@ library(tidyverse)
 library(dplyr)
 library(ggplot2)
 library(car)
-library(Hmisc)
-library(ggfortify)
-library(AICcmodavg)
 library(nlme)
 library(emmeans)
 ```
@@ -36,7 +33,7 @@ head(soil_initial)
 
 This metadata contains information of soil samples collected from remnant, restored, and  agricultural fields from ten sites at Nachusa Grasslands. This data set includes repeated measures completed on May 2 (Spring), August 8(Summer), and October 13 (Autumn) in 2017 (Mason et al., 2023). Additionally, fire management practices (y/n) were also included in this experiment. This study encouraged our interest to understand the role season and fire management practices play in the increase of relative abundance of bacterial counts using repeated studies. 
 
-To test our hypothesis, we would only use the variables, Site, Fire, bacteria, archaea, fungi and season. Our continuous dependent variable would be bacteria, and independent variables would be Site, Fire, and Season. Fire and season were treated as fixed factors and Site would be treated as a random factor, making this a mixed model analysis. 
+To test our hypothesis, we would only use the variables, Site, Fire, bacteria, archaea, fungi and season. Our continuous dependent variable would be bacteria, and independent variables would be Site, Fire, and Season. This data is a repeated measures design, making Fire and Season to be treated as fixed factors and Site as a random factor, making this a mixed model analysis. 
 
 Before proceeding with our analysis, we wrangled our data by converting our Fire, Season and Site variables from data type "char" to "factor". The original data set was filtered to only include Site, Fire, bacteria, archaea, fungi, and season. Additionally, the data was mutated to calculate relative abundance of bacterial counts by dividing bacterial values by the sum of bacteria, archaea, and fungi. 
 ```{r data wrangling}
@@ -63,22 +60,22 @@ final_soil$Fire <- as.factor(final_soil$Fire)
 ```
 
 # Initial Inspection
-What do we wanna show before 
+A histogram was created to idenitify how the values of our dependent variable bact_relative abund look. The histogram looks slighly left-skewed. To add, an itial ggplot was created to  
 ```{r initial plot}
 #created a histogram 
 hist(final_soil$bact_relative_abund)
-#create an initial plot to demonstrate the abundance levels 
-ggplot(final_soil, aes(x=season,y=bact_relative_abund,fill=Fire)) +
+#create an initial plot to demonstrate the how high the bacterial relative abundance levels are 
+initial_plot <- ggplot(final_soil, aes(x=season,y=bact_relative_abund,fill=Fire)) +
   geom_boxplot() +
   scale_y_continuous(limits=c(0,1))
 
-#residuals
-#qqplot
+ggsave(filename = "initial_plot.png",initial_plot)#save and export the .png file
 ```
 
 
 
 # Mixed Model Testing
+Our mixed model was created using the lme() function with bact_relative_abund as our dependent variable, Season (fixed), Fire (fixed) and Site (random) as our independent variables. The residuals of the model, soil_model, were plotted to test assumptions for heteroskedascity and normality. The Anova() function was used to test the model's fixed factors with a type III Chi squared test.
 ```{r mixed model}
 
 #created our linear mixed effect model including our IVs: Season and Fire, and DV:bact_relative_abund using our random variable as Site
@@ -103,6 +100,7 @@ Anova(soil_model, type=3) #type 3 because there's an interaction
 options(contrasts = c("contr.treatment","contr.poly"))
 ```
 
+The summary() and emmeans() functions were used for post-hoc comparisons of the means. 
 ```{r summary}
 #re-ran our model in order to get the summary 
 soil_model <- lme(bact_relative_abund~season*Fire, random = ~1| Site, data = final_soil, method = "ML")
@@ -111,10 +109,6 @@ summary(soil_model)
 #check the emmeans to analyze means from the summary 
 emmeans(soil_model, specs=c('season','Fire'))
 ```
-
-
-do emmeans
-
 
 
 # Final Visualization
