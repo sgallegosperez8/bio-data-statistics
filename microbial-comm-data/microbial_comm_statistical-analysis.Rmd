@@ -1,5 +1,5 @@
 ---
-title: "BIOL606 MIDTERM2 GallegosPerez and Carter"
+title: "Microbial Communities Metadata Statistical Analysis"
 author: "Samantha Gallegos Perez"
 date: "2026-03-11"
 output: html_document
@@ -25,17 +25,17 @@ soil_initial <- read.csv("trimmed_metadata.csv")#load the data
 head(soil_initial)
 ```
 
-## Our Question: Did fire management practice affect the relative abundance of bacteria, and does this depend on season?
+## Question: Did fire management practice affect the relative abundance of bacteria, and does this depend on season?
 
-##Hypothesis: We expect a higher bacterial relative abundance in the warmer months, with summer having the highest, followed by spring, and winter to have the lowest counts. We also predict bacterial amplicon counts will decrease immediately following fire regardless of season.
+##Hypothesis: I expect a higher bacterial relative abundance in the warmer months, with summer having the highest, followed by spring, and winter to have the lowest counts. I also predict bacterial amplicon counts will decrease immediately following fire regardless of season.
 
 # Data Collection and Data Wrangling 
 
-This metadata contains information of soil samples collected from remnant, restored, and  agricultural fields from ten sites at Nachusa Grasslands. This data set includes repeated measures completed on May 2 (Spring), August 8(Summer), and October 13 (Autumn) in 2017 (Mason et al., 2023). Additionally, fire management practices (y/n) were also included in this experiment. This study encouraged our interest to understand the role season and fire management practices play in the increase of relative abundance of bacterial counts using repeated studies. 
+This metadata contains information of soil samples collected from remnant, restored, and  agricultural fields from ten sites at Nachusa Grasslands. This data set includes repeated measures completed on May 2 (Spring), August 8(Summer), and October 13 (Autumn) in 2017 (Mason et al., 2023). Additionally, fire management practices (y/n) were also included in this experiment. This study encouraged my interest to understand the role season and fire management practices play in the increase of relative abundance of bacterial counts using repeated studies. 
 
-To test our hypothesis, we would only use the variables, Site, Fire, bacteria, archaea, fungi and season. Our continuous dependent variable would be bacteria, and independent variables would be Site, Fire, and Season. This data is a repeated measures design, making Fire and Season to be treated as fixed factors and Site as a random factor, making this a mixed model analysis. 
+To test the hypothesis, the only variables, Site, Fire, bacteria, archaea, fungi and season. The continuous dependent variable would be bacteria, and independent variables would be Site, Fire, and Season. This data is a repeated measures design, making Fire and Season to be treated as fixed factors and Site as a random factor, making this a mixed model analysis. 
 
-Before proceeding with our analysis, we wrangled our data by converting our Fire, Season and Site variables from data type "char" to "factor". The original data set was filtered to only include Site, Fire, bacteria, archaea, fungi, and season. Additionally, the data was mutated to calculate relative abundance of bacterial counts by dividing bacterial values by the sum of bacteria, archaea, and fungi. 
+Before proceeding with analysis, the data was wrangled by converting our Fire, Season and Site variables from data type "char" to "factor". The original data set was filtered to only include Site, Fire, bacteria, archaea, fungi, and season. Additionally, the data was mutated to calculate relative abundance of bacterial counts by dividing bacterial values by the sum of bacteria, archaea, and fungi. 
 ```{r data wrangling}
 
 #Only selected necessary columns that include soil, Site, Date, Type, fungi, bacteria and archaea 
@@ -60,25 +60,28 @@ final_soil$Fire <- as.factor(final_soil$Fire)
 ```
 
 # Initial Inspection
-A histogram was created to idenitify how the values of our dependent variable bact_relative abund look. The histogram looks slighly left-skewed. To add, an itial ggplot was created to  
+A histogram was created to idenitify how the values of our dependent variable bact_relative abund look. The histogram looks slighly left-skewed. To add, an initial ggplot was created too. 
 ```{r initial plot}
 #created a histogram 
+png(filename = "Histogram_Plot.png")
 hist(final_soil$bact_relative_abund)
+dev.off()
+
 #create an initial plot to demonstrate the how high the bacterial relative abundance levels are 
 initial_plot <- ggplot(final_soil, aes(x=season,y=bact_relative_abund,fill=Fire)) +
   geom_boxplot() +
   scale_y_continuous(limits=c(0,1))
 
-ggsave(filename = "initial_plot.png",initial_plot)#save and export the .png file
+ggsave(filename = "initial_ggplot.png",initial_plot)#save and export the .png file
 ```
 
 
 
 # Mixed Model Testing
-Our mixed model was created using the lme() function with bact_relative_abund as our dependent variable, Season (fixed), Fire (fixed) and Site (random) as our independent variables. The residuals of the model, soil_model, were plotted to test assumptions for heteroskedascity and normality. The Anova() function was used to test the model's fixed factors with a type III Chi squared test.
+The mixed model was created using the lme() function with bact_relative_abund as the  dependent variable, Season (fixed), Fire (fixed) and Site (random) as the independent variables. The residuals of the model, soil_model, were plotted to test assumptions for heteroskedascity and normality. The Anova() function was used to test the model's fixed factors with a type III Chi squared test.
 ```{r mixed model}
 
-#created our linear mixed effect model including our IVs: Season and Fire, and DV:bact_relative_abund using our random variable as Site
+#created the linear mixed effect model including the IVs: Season and Fire, and DV:bact_relative_abund using the random variable as Site
 soil_model <- lme(bact_relative_abund~season*Fire, random = ~1| Site, data = final_soil, method = "ML")
 
 #exported the initial plot of residuals to Model_Residuals_Plot.png
@@ -92,7 +95,7 @@ qqnorm(resid(soil_model))#initial inspections a linear line/checked the residual
 qqplot_1 <- qqline(resid(soil_model))
 dev.off()
 
-#because the experiment was unbalanced, we would use type III, using the interaction and would need to change the contrasts before and after running Anova
+#because the experiment was unbalanced, type III was used with the interaction and would need to change the contrasts before and after running Anova
 options(contrasts = c("contr.sum","contr.poly"))
 soil_model <- lme(bact_relative_abund~season*Fire, random = ~1| Site, data = final_soil, method = "ML") #remember to refit the model, and to reset contrast after
 Anova(soil_model, type=3) #type 3 because there's an interaction
@@ -101,7 +104,7 @@ options(contrasts = c("contr.treatment","contr.poly"))
 
 The summary() and emmeans() functions were used for post-hoc comparisons of the means. 
 ```{r summary}
-#re-ran our model in order to get the summary 
+#re-ran  model in order to get the summary 
 soil_model <- lme(bact_relative_abund~season*Fire, random = ~1| Site, data = final_soil, method = "ML")
 summary(soil_model)
 
