@@ -1,6 +1,6 @@
 # bio-data-statistics 
 
-Attached are associated projects included in biological data
+Attached are associated projects included in biological data using R markdown
 
 ## [gut-microbiome-stat-analysis](https://github.com/sgallegosperez8/bio-data-statistics/tree/main/Projects/gut-data)
 
